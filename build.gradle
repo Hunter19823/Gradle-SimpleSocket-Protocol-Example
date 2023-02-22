@@ -1,28 +1,45 @@
+// Apply the plugin allows you to make java executable tasks
 apply plugin: 'java'
+// Apply the plugin allows you to set the java version used to compile the project
 apply plugin: 'java-library'
 
+// Set the description of the gradle project
 description = "Client Server Socket Example"
 
+// Set the java version of the gradle project
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(18))
     }
 }
 
+// Set the gradle wrapper version
+// to use a specific version of gradle
 wrapper {
+    // Set the gradle version
     gradleVersion = '7.4.2'
+    // Allow all types of installations of gradle distributions
     distributionType = Wrapper.DistributionType.ALL
 }
 
+// Set the repositories to download the dependencies
 repositories {
+    // Set the maven central repository to download the dependencies
+    // The link to the maven central repository is https://repo1.maven.org/maven2/
     mavenCentral()
 }
 
+// Set the dependencies of the project
 dependencies {
     // Implement gson
+    // The link to the gson library is
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 }
 
+// Tell the IDEA and also java gradle plugin
+// to mark the src folder as the source folder
+// and the resources folder as the resources folder
 sourceSets {
     src {
         main {
@@ -36,36 +53,50 @@ sourceSets {
     }
 }
 
-// Client and Server socket, socket can serve up to three clients
-// The port is defined directly in the Java files. For practice consider changing
-// the tasks to add the port as input to the Gradle task
+// Client and Server socket
+// This task will run the Server capable of handling multiple clients
 task Server(type: JavaExec) {
     group 'TCP Server/Client'
-    description 'Creates Server socket waits for up to 3 messages'
+    description 'Creates Server socket that awaits for new clients to connect'
 
+    // Set the classpath to the the above source sets
     classpath = sourceSets.main.runtimeClasspath
 
+    // Set the main Class relative to the java source files.
     main = 'server.SockServer'
+
     // Set standard input to be the terminal
     standardInput = System.in
 
+    // Get the port number from the project properties or use the default port 8888
     String port = (project.hasProperty("port") ? project.property("port") : "8888")
 
+    // Pass the port to the java arguments
     args port
 }
 
+// This task will run the Client
+// It will connect to the server and send a message
+// The server will respond with a message
 task Client(type: JavaExec) {
     group 'TCP Server/Client'
-    description 'Creates client socket sends a message and number to server'
+    description 'Creates Client socket that connects to the server'
 
+    // Set the classpath to the the above source sets
     classpath = sourceSets.main.runtimeClasspath
 
+    // Set the main Class relative to the java source files.
     main = 'client.SockClient'
+
     // Set standard input to be the terminal
     standardInput = System.in
 
+    // Get the port number from the project properties or use the default port 8888
     String port = (project.hasProperty("port") ? project.property("port") : "8888")
+
+    // Get the host from the project properties or use the default host
     String host = (project.hasProperty("host") ? project.property("host") : "localhost")
 
+    // Pass the port and host to the java arguments
     args port, host
 }
